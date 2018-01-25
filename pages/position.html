@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>position</title>
+	<link rel="stylesheet" href="header.css">
+	<link rel="stylesheet" href="position.css">
+	<link rel="stylesheet" href="bootstrap.min.css">
+	<link rel="stylesheet" href="pagination.css">
+</head>
+<body>
+	<nav class="nav navbar-inverse">
+		<div class="container">
+	      	<ul class="navbar-left">
+			  <li class="pull-left" style="font-size: 14px;"><a href="#">拉勾网管理系统</a></li>
+			  <li class="pull-left index"><a href="#">首页</a></li>
+			  <li class="pull-left"><a href="#" class="zhiwei">职位管理</a></li>
+			</ul>
+			<ul class="navbar-right">
+			  <li class="pull-left"><a href="#" id="name">你好</a></li>
+			  <li class="pull-left cancel"><a href="#">注销</a></li>
+			</ul>
+		</div>
+	</nav>
+	<div class="title">
+		<p style="float:left;margin-left: 24px;">职位管理</p>
+		<button type="button" class="btn btn-primary addtion" style="float:right;margin-right:7px;" data-toggle="modal" data-target="#add">添加</button>
+	</div>
+	<div class="position_title">
+		<div>序号</div>
+		<div>公司logo</div>
+		<div>职位名称</div>
+		<div>公司名称</div>
+		<div>工作经验</div>
+		<div>职位类型</div>
+		<div>工作地点</div>
+		<div>职位薪资</div>
+		<div style="border-right:1px solid #ececec;">操作</div>
+	</div>
+	
+	<div class="detail">
+		
+	</div>
+	<!--添加-->
+	<div class="modal fade" tabindex="-1" id="add" role="dialog">
+	  <div class="modal-dialog" role="document">
+	    <div class="modal-content">
+	      <div class="modal-header">
+	        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+	        <h4 class="modal-title" style="font-weight: 600;">职位信息</h4>
+	      </div>
+	      <div class="modal-body">
+	          <div class="form-group">
+			    <label for="InputFile">公司logo</label>
+			    <input type="file" class="form-control showImg">
+			    <img class="pic" src="https://ss0.bdstatic.com/5aV1bjqh_Q23odCf/static/superman/img/logo_top_ca79a146.png" alt="" style="height:60px;width:86px">
+			  </div>
+			  <div class="form-group">
+			    <label for="position">职位名称</label>
+			    <input type="text" class="form-control job_name"  placeholder="输入职位名称">
+			  </div>
+			  <div class="form-group">
+			    <label for="company">公司名称</label>
+			    <input type="text" class="form-control company_name"  placeholder="输入公司名称">
+			  </div>
+			  <div class="form-group">
+			    <label for="experience">工作经验</label>
+			    <input type="text" class="form-control job_experience"  placeholder="输入工作经验">
+			  </div>
+			  <div class="form-group">
+			    <label for="type">职位类型</label>
+			    <input type="text" class="form-control job_type"  placeholder="输入职位类型">
+			  </div>
+			  <div class="form-group">
+			    <label for="site">工作地点</label>
+			    <input type="text" class="form-control job_site"  placeholder="输入工作地点">
+			  </div>
+			  <div class="form-group">
+			    <label for="pay">岗位薪资</label>
+			    <input type="text" class="form-control salary"  placeholder="输入岗位薪资">
+			  </div>
+	      </div>
+		      <div class="modal-footer">
+        		<button type="submit" class="btn btn-primary submit">提交</button>
+        		<button type="submit" class="btn btn-primary confirm_update" style="display: none;">确认修改</button>
+	      	  </div>
+	    </div>
+	  </div>
+	</div>
+	<div class="M-box m-style"></div>
+
+	<script src="jquery-1.12.4.min.js"></script>
+	<script src="jquery.cookie.js"></script>
+	<script src="jquery.pagination.js"></script>
+	<script src="bootstrap.min.js"></script>
+	<script src="artTamplate.js"></script>
+	<script>
+		
+		var submit = $(".submit"), pic = $(".pic"), detail = $(".detail"), logo = $(".logo"), position= $(".position"), company = $(".company"), experience = $(".experience"), type = $(".type"), site = $(".site"), pay = $(".pay"), job_name = $(".job_name"), company_name = $(".company_name"), job_experience = $(".job_experience"), job_type = $(".job_type"), job_site = $(".job_site"), salary = $(".salary"), showImg = $(".showImg"), add = $("#add"), del = $(".del"), update = $(".update"), confirm_update = $(".confirm_update"), addtion = $(".addtion"), zhiwei = $(".zhiwei"), index = $(".index"), order = $(".order");
+
+		/***************截取use的值**************/
+		// var name = location.search.split('=')[1];
+		// // console.log(name)
+		// if(name == "undefined"){
+		// 	var cookies = $.cookie("username")
+		// 	console.log(cookies)
+		// 	$("#name").html("您好！ "+cookies);
+		// }
+		// $("#name").html("您好！ "+name);
+		// $.cookie("username",name,{expires:7,path:"/"});
+
+		var use = $.cookie("username");
+		if(use.length){
+			$("#name").text(use);
+			// $(".off").show();
+			// $("#logins").hide();
+			// $("#regists").hide();
+		}
+
+		zhiwei.css({"color":"white","background":"black"});
+		$("#name").css({"color":"white","background":"black"});
+
+		// console.log(name)
+		
+		
+		index.on("click",function(){
+			// var cookies = ;
+			// console.log(cookies)
+			location.href="index.html?use="+name;
+			// $("#name").html("您好！ "+ $.cookie("username"));
+		});
+		$(".cancel").on("click",function(){
+
+			location.href="index.html";
+
+		});
+
+		/***************弹出模态窗**************/
+		addtion.on('click', function () {
+		  	pic.attr("src","https://ss0.bdstatic.com/5aV1bjqh_Q23odCf/static/superman/img/logo_top_ca79a146.png");
+			job_name.val('');
+			company_name.val('');
+			job_experience.val('');
+			job_type.val('');
+			job_site.val('');
+			salary.val('');
+		});
+
+		
+		// $.get("/position",function(data){	
+		// 	if(!data.list.length) return;
+		// 	var html = template("position",data);
+		// 	detail.html(html);
+		// }).then(function(){
+		// 	/***************分页**************/
+		// 	$('.M-box').pagination({
+		// 		totalData: 20,
+		// 	    showData: 5,
+		// 	    coping: true,
+		// 	    callback: function (api) {
+		// 	    	var page = api.getCurrent;
+		// 	        $('.now').text(api.getCurrent());
+		// 	        $.post("/page",page,function(res){
+		// 	        	console.log(res)
+		// 	        	// detail.html(html);
+		// 	        });
+		// 	    }
+		// 	}); 
+		// });
+	
+		var Storage = window.localStorage;
+
+		function loadpage(){
+			$.post("/position",function(res){
+				
+	        	count = res.list;
+	        	Storage.list = res.list;
+	        	console.log(res)
+	        	if(count == 0){
+	        	   count = 1;
+	        	}
+	        }).then(function(){
+		        	$('.M-box').pagination({
+					totalData: count,
+				    showData: 5,
+				    current:Storage.page,
+				    isHide:true,
+				    callback: function (api) {
+				    	Storage.page = api.getCurrent();
+				    	loadlist(Storage.page);
+						indexs(Storage.page);
+						console.log(Storage.page);
+
+				    }
+				});
+	        });
+		}
+
+		loadpage();
+		loadlist(Storage.page);
+
+		/***************加载列表**************/
+		function loadlist(page=1){
+
+			$.post("/page",{page},function(data){	
+				// console.log(page)
+				var html = template("position",data);
+				detail.html(html);
+			}).then(function(){
+				indexs(Storage.page);
+			});
+		}
+
+
+		//序号
+		function indexs(pag = 1){
+			var len = $('.detail_position').length;
+			for(let i = 0; i < len; i++){
+				// console.log(i);
+				$($('.detail_position')[i]).find('.order').text(i+1+(pag-1)*5);
+			}
+		}
+
+		/***************图片上传**************/
+		showImg.on("change",function(event){
+			event.preventDefault();
+			var file = this.files[0];
+
+			if(file.type == "image/jpeg" || file.type == "image/png"){
+				var form = new FormData();
+				form.append("upload",file);
+				$.ajax({
+					url:"/upload",
+					type:"POST",
+					dataType:"json",
+					data:form,
+					contentType:false,
+					processData:false
+				}).done(function(res){
+					if(!res.code){
+						pic.attr({
+							src:res.img
+						});
+					}
+				})
+			}
+		});
+
+		/***************处理提交点击事件**************/
+		submit.on("click",function(event){
+			event.preventDefault();
+			var params = {}; 			
+				params.logo = pic.attr("src");
+				params.position = job_name.val().trim();
+				params.company = company_name.val().trim();
+				params.experience = job_experience.val().trim();
+				params.type = job_type.val().trim();
+				params.site = job_site.val().trim();
+				params.pay = salary.val().trim();
+				
+			if(!params.logo || !params.position || !params.company || 
+			   !params.experience || !params.site || !params.pay){
+				alert("不能为空，请完整填写！")
+				return;
+			}
+			$.post("/upload/position", params, function(res){
+				var html = template("position",{list:[res.position]});
+				if(detail.find(".detail_position").length == 5){
+					loadpage();
+				}else{
+					if(detail.find("#null").length){
+						detail.html(html);
+					}else{
+						detail.append(html);
+					}
+				}
+				// }else{
+				// 	loadpage();
+				// }
+				
+				pic.attr("src","https://ss0.bdstatic.com/5aV1bjqh_Q23odCf/static/superman/img/logo_top_ca79a146.png");
+				job_name.val('');
+				company_name.val('');
+				job_experience.val('');
+				job_type.val('');
+				job_site.val('');
+				salary.val('');
+				add.modal("hide");
+			}).then(function(){
+				indexs(Storage.page);
+			});
+		});
+
+		/***************删除**************/
+		/*detail.on("click",".del",function(){
+			$.post("/delete/position", {_id:this.dataset.id},(data)=>{
+				$(this).parents(".detail_position").remove();
+				if(detail.find(".detail_position").length == 0){
+					detail.html(`<p id="null">空空如也。。。</p>`);
+				}
+			})
+		});*/
+		detail.on("click",".del",function(){
+			$.post("/delete/position", {_id:this.dataset.id},(data)=>{
+				$(this).parents(".detail_position").remove();
+				// if(Storage.list <= 5){
+				// 	$(".M-box").hide();
+				// }
+			
+				// if(Storage.page == 1 && data.list.length <= 5){
+				// 	$(".M-box").hide();
+				// }
+				// if(detail.find(".detail_position").length == 0){
+				// 	detail.html(`<p id="null">空空如也。。。</p>`);
+				// }
+			}).then(function(){
+				if(detail.find(".detail_position").length ==0){
+					if(Storage.page != 1){//页数不能小于1
+						Storage.page -= 1;
+					}
+					loadpage();
+					// loadlist(Storage.page);
+					// indexs(Storage.page);
+				}
+			})
+			loadlist(Storage.page);
+			// indexs(Storage.page);
+		});
+
+		/***************更新赋值**************/
+		detail.on("click",".update",function(){
+
+			var li = $(this).parents(".detail_position");
+			add.modal("show");
+			confirm_update.show();
+			confirm_update.id = this.dataset.id;
+			submit.hide();
+			
+			pic.attr("src",li.find(".logo img").attr("src"));
+			job_name.val(li.find(".position").html());
+			company_name.val(li.find(".company").html());
+			job_experience.val(li.find(".experience").html());
+			job_type.val(li.find(".type").html());
+			job_site.val(li.find(".site").html());
+			salary.val(li.find(".pay").html());
+			
+		})
+
+		/***************执行更新**************/
+		confirm_update.on("click",function(){	
+			var params = {}; 
+				params.id = confirm_update.id;			
+				params.logo = pic.attr("src");
+				params.position = job_name.val().trim();
+				params.company = company_name.val().trim();
+				params.experience = job_experience.val().trim();
+				params.type = job_type.val().trim();
+				params.site = job_site.val().trim();
+				params.pay = salary.val().trim();
+	
+			if(!params.id) return;
+
+			if(!params.company || !params.position){
+				alert("请输入公司及职位名称");
+				return;
+			} 
+
+			$.post("/update/position", params, (res)=>{	
+				console.log(res)
+				var html = template("position",{list:[res.doc]});
+				var parent = $(".update[data-id="+confirm_update.id+"]").parents(".detail_position");
+				parent.replaceWith(html);
+				confirm_update.id = null;
+				submit.show();
+				confirm_update.hide();
+				add.modal("hide");
+				pic.attr("src","https://ss0.bdstatic.com/5aV1bjqh_Q23odCf/static/superman/img/logo_top_ca79a146.png");
+			}).then(function(){
+				indexs(Storage.page);
+			});
+		});
+		
+	</script>
+	<script type="text/html" id="position">
+		{{each list as element index}}	
+		<div class="detail_position" style="margin-top: 0;">
+			<div class="order"></div>
+			<div class="logo"><img src="{{element.logo}}" alt="" style="width: 60px;height:58px;"></div>
+			<div class="position">{{element.position}}</div>
+			<div class="company">{{element.company}}</div>
+			<div class="experience">{{element.experience}}</div>
+			<div class="type">{{element.type}}</div>
+			<div class="site">{{element.site}}</div>
+			<div class="pay">{{element.pay}}</div>
+			<div class="operate" style="border-right:1px solid #ececec;">
+				<a data-id={{element._id}} class="update">修改</a>
+            	<a data-id={{element._id}} class="del">删除</a>
+			</div>
+		</div>
+		{{/each}}
+	</script>
+</body>
+</html>

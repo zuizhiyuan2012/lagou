@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Document</title>
+	<link rel="stylesheet" href="common.css">
+	<link rel="stylesheet" href="https://cdn.bootcss.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+	<style>
+		.navbar-user{
+			display: inline-block;
+			float: right;
+			height: 100%;
+			line-height: 50px;
+		}
+	</style>
+</head>
+<body>
+	<section class="container">
+			<nav class="navbar navbar-default">
+		  <div class="container-fluid">
+		    <div class="navbar-header">
+		      <a class="navbar-brand" href="#" style="padding-top:8px">
+		        <img alt="Brand" src="https://www.lgstatic.com/www/static/common/widgets/header_c/modules/img/logo_1c5763c.png">
+		      </a>
+		    </div>
+		    <div class="navbar-user">欢迎: <span id="name"></span></div>
+		  </div>
+		</nav>
+	    <ul class="list-group">
+		   <p id="null">
+		   	  此处空荡荡...
+		   </p>
+		</ul>
+
+		<div>
+		  <div class="form-group">
+		     <input type="text" class="form-control" id="title" placeholder="评论标题">
+		     <textarea class="form-control" rows="3" id="detail" placeholder="请数人头评论内容..."></textarea>
+		     <div class="form-group">
+			    <label for="InputFile">上传图片</label>
+			    <input type="file" id="InputFile">
+			    <img id="showImg" src="https://ss0.bdstatic.com/5aV1bjqh_Q23odCf/static/superman/img/logo_top_ca79a146.png" alt="" style="height:60px;width:60px">
+			  </div>
+		     <button class="btn btn-success btn-lg btn-block" id="sub">提交</button>
+		     <button class="btn btn-success btn-lg btn-block" id="update" style="display: none;">确认修改</button>
+		  </div>
+
+		</div>
+	</section>
+</body>
+<script src="http://apps.bdimg.com/libs/jquery/2.1.4/jquery.min.js"></script>
+<script src="artTamplate.js"></script>
+<script>
+	var btn = $(".btn"),$listgroup = $('.list-group'),$showImg=$("#showImg"),$InputFile=$("#InputFile"),$sub=$("#sub"),$title=$("#title"),$detail=$("#detail");
+	var name = location.search.split('=')[1];
+	$("#name").html(name);
+
+	$.get('/api/comment',function(data){
+		if(!data.list.length) return;
+		var html = template("listTemp",data);
+		$listgroup.html(html);
+	})
+	$InputFile.on('change',function(event){
+		event.preventDefault();
+		var file = this.files[0];
+		if(!file)  return;
+		if(file.type == 'image/png'||file.type=="image/jpeg"){
+			var form = new FormData();
+			form.append("upload",file);
+			$.ajax({
+				url:'/upload',
+				type:'POST',
+				dataType:"json",
+				data:form,
+				contentType:false,
+				processData:false
+			}).done(function(res){
+				if(!res.code){
+					$showImg.attr({
+						src:res.img
+					});
+				}
+			});
+		}
+	});
+	$sub.on("click",function(event){
+		event.preventDefault();
+		var params = {};
+		params.title = $title.val().trim();
+		params.detail = $detail.val().trim();
+		params.img = $showImg.attr("src");
+		params.author = name;
+
+		if(!params.title || !params.detail){
+			alert("此人很懒什么都没留下。。。");
+			return;
+		};
+		$.post("/upload/comment",params,function(res){
+			console.log(res);
+			var li = template("listTemp",{list:[res.comment]});
+			if($listgroup.find("#null").length){
+				$listgroup.html(li);
+			}else{		
+				$listgroup.append(li);
+			}
+			
+			$title.val('');
+			$detail.val('');
+			$showImg.attr("src","https://ss0.bdstatic.com/5aV1bjqh_Q23odCf/static/superman/img/logo_top_ca79a146.png");
+		});
+	});
+	$(".list-group").on('click',".delete",function(){
+		// console.log(this.dataset)
+		$.post('/delete/comment',{_id:this.dataset.id},(data)=>{
+			// console.log(data)
+			$(this).parents('.list-group-item').remove();
+			// console.log(!$listgroup.find('li.list-group-item').length)
+			/*if($listgroup.find('li.list-group-item').length == 0){
+			
+				$listgroup.append(`<p id="null">此处空荡荡...</p>`);
+			}*/
+			!$listgroup.find('li.list-group-item').length?$listgroup.append(`<p id="null">此处空荡荡...</p>`):"";
+		})
+	});
+	// var btn = $(".btn"),$listgroup=$(".list-group");
+
+	$(".list-group").on("click",".update",function(){
+		$("#sub").hide();
+		$("#update").show();
+	
+		var params = {};
+		params.title = $(this).parent().children(".list-group-item-heading").text().trim();
+		params.detail = $(this).parent().children(".list-group-item-text").text().trim();
+		params.img = $(this).parent().find("img").attr("src");
+		
+
+		$.post('/update/comment',params,(res)=>{
+			console.log(res)
+			
+			var title = $title;
+				detail = $detail;
+				img = $showImg;
+
+				$(this).parent().children(".list-group-item-heading").text() = title;
+				$(this).parent().children(".list-group-item-text").text() = detail;
+				$(this).parent().find("img").attr("src") = img;
+		});
+	});
+</script>
+<script type="text/html" id="listTemp">
+	{{each list as item index}}
+	<li class="list-group-item">
+		<h4 class="list-group-item-heading">{{item.title}}</h4>
+		<p class="list-group-item-text">{{item.detail}}<img src="{{item.img}}" alt="" style="width:60px;height:60px;"></p>	
+		<button class="btn btn-warning delete" data-id={{item._id}}>删除</button>
+		<button class="btn update btn-danger" data-id={{item._id}}>修改</button>
+	</li>
+	{{/each}}
+</script>
+</html>

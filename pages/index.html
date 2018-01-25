@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>index</title>
+	<link rel="stylesheet" href="header.css">
+	<link rel="stylesheet" href="bootstrap.min.css">
+</head>
+<body>
+	<nav class="nav navbar-inverse">
+		<div class="container">
+	      	<ul class="navbar-left">
+			  <li class="pull-left" style="font-size: 14px;"><a href="#">拉勾网管理系统</a></li>
+			  <li class="pull-left"><a href="#" class="index">首页</a></li>
+			  <li class="pull-left manage"><a href="#">职位管理</a></li>
+			</ul>
+			<ul class="navbar-right">
+			  <li class="pull-left" data-toggle="modal" data-target="#login" id="logins"><a href="#">登录</a></li>
+			  <li class="user_title" style="display: none;color: #fff;"></li>
+			  <li class="pull-left" data-toggle="modal" data-target="#register" id="regists"><a href="#">注册</a></li>
+			  <li class="off" style="display: none;">注销</li>
+			</ul>
+		</div>
+	</nav>
+	<!--注册-->
+	<div class="modal fade" tabindex="-1" id="register" role="dialog">
+	  <div class="modal-dialog" role="document">
+	 	<div class="modal-content">
+	      <div class="modal-header">
+	        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+	        <h4 class="modal-title" style="font-weight: 600;">用户注册</h4>
+	      </div>
+	      <div class="modal-body">
+	          <div class="form-group">
+			    <label for="username">用户名</label>
+			    <input type="text" class="form-control" placeholder="输入用户名" id="username">
+			  </div>
+			  <div class="form-group">
+			    <label for="password">密码</label>
+			    <input type="password" class="form-control" id="password" placeholder="输入密码">
+			  </div>
+		      <div class="form-group">
+			    <label for="password">确认密码</label>
+			    <input type="password" class="form-control" id="password1" placeholder="再次输入密码">
+			  </div>
+			  <div class="form-group">
+			    <label for="email">邮箱</label>
+			    <input type="email" class="form-control"  id="email" placeholder="输入e-mail地址">
+			  </div>
+	      </div>
+		      <div class="modal-footer">
+		        <button type="button" class="btn btn-primary btnrgs">注册</button>
+		      </div>
+	      </div>
+	    </div>
+	  </div>
+	</div>
+
+	<!--登录-->
+	<div class="modal fade" tabindex="-1" id="login" role="dialog">
+	  <div class="modal-dialog" role="document">
+	    <div class="modal-content">
+	      <div class="modal-header">
+	        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+	        <h4 class="modal-title" style="font-weight: 600;">登录</h4>
+	      </div>
+	      <div class="modal-body">
+	          <div class="form-group">
+			    <label for="username">用户名</label>
+			    <input type="text" class="form-control"  id="use" placeholder="输入用户名">
+			  </div>
+			  <div class="form-group">
+			    <label for="password">密码</label>
+			    <input type="password" class="form-control" id="pwd" placeholder="输入密码">
+			  </div>
+	      </div>
+		      <div class="modal-footer">
+		         <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+        		<button type="button" class="btn btn-primary btnlog">登录</button>
+	      	  </div>
+	    </div>
+	  </div>
+	</div>
+	<script src="jquery-1.12.4.min.js"></script>
+	<script src="jquery.cookie.js"></script>
+	<script src="bootstrap.min.js"></script>
+	<script>
+		var login = $("#login"), register = $("#register"), username = $("#username"), password = $("#password"), use=$("#use"), pwd=$("#pwd"), password1 = $("#password1"), btnrgs = $(".btnrgs"), btnlog = $(".btnlog"), email=$("#email"), index=$(".index"), manage = $(".manage");
+
+		manage.on("click",function(){
+			location.href="position.html";
+		});
+
+		var use = $.cookie("username");
+		if(use.length){
+			$(".user_title").show().text(use);
+			$(".off").show();
+			$("#logins").hide();
+			$("#regists").hide();
+		}
+
+		console.log(location.search)
+		// checkcookie();
+		index.css({"color":"white","background":"black"});
+		btnrgs.on("click",function(){
+		
+			var params = {};
+				params.username = username.val().trim();
+				params.password = password.val().trim();
+				params.email = email.val().trim();
+			var reg = /^[a-z0-9]+([._\\-]*[a-z0-9])*@([a-z0-9]+[-a-z0-9]*[a-z0-9]+.){1,63}[a-z0-9]+$/;
+
+			if(!params.username || !params.password){
+				alert("不能为空！");
+				return;
+			}
+
+			if(params.password != password1.val().trim()){
+				alert("密码不一致！");
+				return;
+			}
+			// console.log(reg.test(email.val()))
+			if(!reg.test(email.val())){
+				alert("邮箱格式错误！");
+				return;
+			}
+
+			$.post("/register", params, function(data){		
+				if(data.code == 0){
+					alert("账号已存在！");
+				}else if(data.code == 1){
+					register.modal("hide");
+					login.modal("show");
+					use.val(params.username);
+					return;
+				}
+			});
+		});
+
+		btnlog.on("click",function(){
+			var params = {};
+				params.use = use.val().trim();
+				params.pwd = pwd.val().trim();
+
+			$.post("/login", params, function(data){
+				
+				if(data.code == 1){
+					$.cookie("username",params.use, {expires:7,path:"/"});
+					// location.href="/position.html?use="+params.use;			
+				}else{
+					console.log(data.msg);
+				}
+				// checkcookie();
+			})
+		});
+		// function checkcookie(){
+		// 	var user = $.cookie("username");
+		// 	if(user && user != "null"){
+		// 		console.log("登录成功！")
+		// 	}else{
+		// 		console.log("登录失败！")
+		// 	}
+		// }
+	</script>
+</body>
+</html>
