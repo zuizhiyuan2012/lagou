@@ -99,16 +99,6 @@
 		var submit = $(".submit"), pic = $(".pic"), detail = $(".detail"), logo = $(".logo"), position= $(".position"), company = $(".company"), experience = $(".experience"), type = $(".type"), site = $(".site"), pay = $(".pay"), job_name = $(".job_name"), company_name = $(".company_name"), job_experience = $(".job_experience"), job_type = $(".job_type"), job_site = $(".job_site"), salary = $(".salary"), showImg = $(".showImg"), add = $("#add"), del = $(".del"), update = $(".update"), confirm_update = $(".confirm_update"), addtion = $(".addtion"), zhiwei = $(".zhiwei"), index = $(".index"), order = $(".order");
 
 		/***************截取use的值**************/
-		// var name = location.search.split('=')[1];
-		// // console.log(name)
-		// if(name == "undefined"){
-		// 	var cookies = $.cookie("username")
-		// 	console.log(cookies)
-		// 	$("#name").html("您好！ "+cookies);
-		// }
-		// $("#name").html("您好！ "+name);
-		// $.cookie("username",name,{expires:7,path:"/"});
-
 		var use = $.cookie("username");
 		if(use.length){
 			$("#name").text(use);
@@ -119,20 +109,15 @@
 
 		zhiwei.css({"color":"white","background":"black"});
 		$("#name").css({"color":"white","background":"black"});
-
-		// console.log(name)
-		
 		
 		index.on("click",function(){
-			// var cookies = ;
-			// console.log(cookies)
-			location.href="index.html?use="+name;
-			// $("#name").html("您好！ "+ $.cookie("username"));
-		});
-		$(".cancel").on("click",function(){
-
 			location.href="index.html";
+		});
 
+		$(".cancel").on("click",function(){
+			// login.show();
+			// register.show();
+			location.href="index.html";
 		});
 
 		/***************弹出模态窗**************/
@@ -153,29 +138,12 @@
 		// 	detail.html(html);
 		// }).then(function(){
 		// 	/***************分页**************/
-		// 	$('.M-box').pagination({
-		// 		totalData: 20,
-		// 	    showData: 5,
-		// 	    coping: true,
-		// 	    callback: function (api) {
-		// 	    	var page = api.getCurrent;
-		// 	        $('.now').text(api.getCurrent());
-		// 	        $.post("/page",page,function(res){
-		// 	        	console.log(res)
-		// 	        	// detail.html(html);
-		// 	        });
-		// 	    }
-		// 	}); 
-		// });
-	
 		var Storage = window.localStorage;
 
 		function loadpage(){
 			$.post("/position",function(res){
-				
 	        	count = res.list;
-	        	Storage.list = res.list;
-	        	console.log(res)
+	      
 	        	if(count == 0){
 	        	   count = 1;
 	        	}
@@ -189,8 +157,6 @@
 				    	Storage.page = api.getCurrent();
 				    	loadlist(Storage.page);
 						indexs(Storage.page);
-						console.log(Storage.page);
-
 				    }
 				});
 	        });
@@ -201,9 +167,7 @@
 
 		/***************加载列表**************/
 		function loadlist(page=1){
-
 			$.post("/page",{page},function(data){	
-				// console.log(page)
 				var html = template("position",data);
 				detail.html(html);
 			}).then(function(){
@@ -211,12 +175,10 @@
 			});
 		}
 
-
 		//序号
 		function indexs(pag = 1){
 			var len = $('.detail_position').length;
 			for(let i = 0; i < len; i++){
-				// console.log(i);
 				$($('.detail_position')[i]).find('.order').text(i+1+(pag-1)*5);
 			}
 		}
@@ -237,6 +199,7 @@
 					contentType:false,
 					processData:false
 				}).done(function(res){
+					console.log(res)
 					if(!res.code){
 						pic.attr({
 							src:res.img
@@ -274,10 +237,7 @@
 						detail.append(html);
 					}
 				}
-				// }else{
-				// 	loadpage();
-				// }
-				
+
 				pic.attr("src","https://ss0.bdstatic.com/5aV1bjqh_Q23odCf/static/superman/img/logo_top_ca79a146.png");
 				job_name.val('');
 				company_name.val('');
@@ -292,39 +252,23 @@
 		});
 
 		/***************删除**************/
-		/*detail.on("click",".del",function(){
-			$.post("/delete/position", {_id:this.dataset.id},(data)=>{
-				$(this).parents(".detail_position").remove();
-				if(detail.find(".detail_position").length == 0){
-					detail.html(`<p id="null">空空如也。。。</p>`);
-				}
-			})
-		});*/
 		detail.on("click",".del",function(){
 			$.post("/delete/position", {_id:this.dataset.id},(data)=>{
 				$(this).parents(".detail_position").remove();
-				// if(Storage.list <= 5){
-				// 	$(".M-box").hide();
-				// }
-			
-				// if(Storage.page == 1 && data.list.length <= 5){
-				// 	$(".M-box").hide();
-				// }
-				// if(detail.find(".detail_position").length == 0){
-				// 	detail.html(`<p id="null">空空如也。。。</p>`);
-				// }
 			}).then(function(){
 				if(detail.find(".detail_position").length ==0){
-					if(Storage.page != 1){//页数不能小于1
-						Storage.page -= 1;
+					console.log(Storage.page)
+					if(Storage.page != 1){
+					   Storage.page -= 1;
 					}
 					loadpage();
-					// loadlist(Storage.page);
+					loadlist(Storage.page);
 					// indexs(Storage.page);
 				}
-			})
-			loadlist(Storage.page);
+				loadlist(Storage.page);
 			// indexs(Storage.page);
+			})
+			
 		});
 
 		/***************更新赋值**************/
@@ -366,7 +310,7 @@
 			} 
 
 			$.post("/update/position", params, (res)=>{	
-				console.log(res)
+				// console.log(res)
 				var html = template("position",{list:[res.doc]});
 				var parent = $(".update[data-id="+confirm_update.id+"]").parents(".detail_position");
 				parent.replaceWith(html);
